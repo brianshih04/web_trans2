@@ -1,6 +1,9 @@
 # CodeWhale
 .codewhale/
 
+# Cloudflare CLI cache
+.wrangler/
+
 # IDE
 .vscode/
 .idea/
