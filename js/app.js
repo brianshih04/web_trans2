@@ -111,6 +111,10 @@ function bindEvents() {
     }
   });
 
+  // Send buttons
+  $('#sendA').addEventListener('click', () => handleTextTranslate('A'));
+  $('#sendB').addEventListener('click', () => handleTextTranslate('B'));
+
   // History drawer
   $('#btnHistory').addEventListener('click', openHistory);
   $('#btnCloseHistory').addEventListener('click', closeHistory);
@@ -185,11 +189,11 @@ function stopListening(panelId) {
   const session = sessions[panelId];
   if (!session) return;
 
-  session.stop();
+  // stop() returns the latest accumulated transcript immediately
+  const originalText = session.stop() || getTranscript(panelId, 'original');
   panel.status = 'processing';
   updatePanelUI(panelId);
 
-  const originalText = getTranscript(panelId, 'original');
   if (!originalText.trim()) {
     resetPanel(panelId);
     return;

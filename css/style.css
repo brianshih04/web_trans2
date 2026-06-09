@@ -275,12 +275,53 @@ body {
   color: var(--text-muted);
 }
 
-.panel[data-mode="text"] .transcript {
+/* Text input — send button group */
+.input-group {
   display: none;
+  width: 100%;
+  gap: 0;
+}
+
+.panel[data-mode="text"] .input-group {
+  display: flex;
+}
+
+.input-group .text-input {
+  flex: 1;
+  display: block;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  border-right: none;
+}
+
+.btn-send {
+  width: 48px;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--bg);
+  color: var(--text-dim);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+
+.btn-send:active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
 }
 
 .panel[data-mode="text"] .text-input {
   display: block;
+}
+
+/* No-speech: always show input-group */
+.no-speech .input-group {
+  display: flex !important;
 }
 
 /* === Panel Footer === */

@@ -26,7 +26,7 @@ export function isSpeechSupported() {
  * @param {Function} opts.onResult  - Called with (text: string, isFinal: boolean)
  * @param {Function} opts.onError   - Called with (errorMessage: string)
  * @param {Function} opts.onStateChange - Called with (state: 'listening' | 'idle' | 'error')
- * @returns {{ start: Function, stop: Function, abort: Function }}
+ * @returns {{ start: Function, stop: Function, abort: Function, stop: () => string }}
  */
 export function createSpeechSession({ lang, onResult, onError, onStateChange }) {
   const SpeechRecognition =
@@ -34,7 +34,7 @@ export function createSpeechSession({ lang, onResult, onError, onStateChange }) 
 
   if (!SpeechRecognition) {
     onError('此瀏覽器不支援語音辨識');
-    return { start() {}, stop() {}, abort() {} };
+    return { start() {}, stop() { return ''; }, abort() {} };
   }
 
   const recognition = new SpeechRecognition();
@@ -46,6 +46,7 @@ export function createSpeechSession({ lang, onResult, onError, onStateChange }) 
 
   let isActive = false;
   let finalTranscript = '';
+  let latestText = '';                  // Most recent transcript (interim or final)
 
   recognition.onresult = (event) => {
     let interim = '';
@@ -59,8 +60,8 @@ export function createSpeechSession({ lang, onResult, onError, onStateChange }) 
       }
     }
 
-    const displayText = finalTranscript + interim;
-    onResult(displayText, false);
+    latestText = finalTranscript + interim;
+    onResult(latestText, false);
   };
 
   recognition.onerror = (event) => {
@@ -106,6 +107,7 @@ export function createSpeechSession({ lang, onResult, onError, onStateChange }) 
     /** Begin (or resume) listening */
     start() {
       finalTranscript = '';
+      latestText = '';
       isActive = true;
       onStateChange('listening');
       try {
@@ -115,7 +117,10 @@ export function createSpeechSession({ lang, onResult, onError, onStateChange }) 
       }
     },
 
-    /** Stop listening gracefully, deliver final result */
+    /**
+     * Stop listening gracefully.
+     * @returns {string} The latest captured transcript text
+     */
     stop() {
       isActive = false;
       try {
@@ -123,6 +128,7 @@ export function createSpeechSession({ lang, onResult, onError, onStateChange }) 
       } catch (e) {
         // May already be stopped
       }
+      return latestText;
     },
 
     /** Abort immediately, discard any pending result */

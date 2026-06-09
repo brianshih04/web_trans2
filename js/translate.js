@@ -3,6 +3,7 @@
  *
  * Default backend: MyMemory (free, no API key required).
  * Easily extensible to other backends (Google, DeepL, LibreTranslate, etc.).
+ * Built-in LRU cache reduces redundant API calls.
  */
 
 // -- Backend registry -------------------------------------------------------
@@ -44,6 +45,35 @@ registerBackend('mymemory', async (text, from, to) => {
   return data.responseData.translatedText;
 });
 
+// -- LRU Cache --------------------------------------------------------------
+
+const cache = new Map();
+const CACHE_MAX = 200;
+
+function cacheKey(text, from, to) {
+  return `${from}:${to}:${text}`;
+}
+
+function cacheGet(text, from, to) {
+  const key = cacheKey(text, from, to);
+  if (!cache.has(key)) return null;
+  // Move to end (most recently used)
+  const value = cache.get(key);
+  cache.delete(key);
+  cache.set(key, value);
+  return value;
+}
+
+function cacheSet(text, from, to, value) {
+  const key = cacheKey(text, from, to);
+  cache.set(key, value);
+  // Evict oldest if over limit
+  if (cache.size > CACHE_MAX) {
+    const first = cache.keys().next().value;
+    cache.delete(first);
+  }
+}
+
 // -- Public API -------------------------------------------------------------
 
 let activeBackend = 'mymemory';
@@ -77,13 +107,20 @@ export async function translate(text, from, to) {
     return trimmed;
   }
 
+  // Check cache first
+  const cached = cacheGet(trimmed, from, to);
+  if (cached !== null) return cached;
+
   const backend = backends[activeBackend];
   if (!backend) {
     throw new Error(`未註冊的翻譯後端：${activeBackend}`);
   }
 
   try {
-    return await backend(trimmed, from, to);
+    const result = await backend(trimmed, from, to);
+    // Cache the result
+    cacheSet(trimmed, from, to, result);
+    return result;
   } catch (err) {
     console.error('Translation error:', err);
     throw new Error('翻譯服務暫時無法使用，請稍後再試');
