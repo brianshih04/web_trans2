@@ -1,0 +1,10 @@
+# CodeWhale
+.codewhale/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

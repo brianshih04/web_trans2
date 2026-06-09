@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="即時雙向語音翻譯工具 — 按住說話，即時翻譯">
+  <title>即時雙向翻譯</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Favicon (inline SVG) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ====== Header ====== -->
+    <header id="header">
+      <h1>即時翻譯</h1>
+      <div class="header-actions">
+        <button class="btn-icon" id="btnHistory" title="對話記錄">📋</button>
+      </div>
+    </header>
+
+    <!-- ====== No-Speech Notice ====== -->
+    <div class="no-speech-notice">
+      ⚠️ 您的瀏覽器不支援語音辨識<br>
+      請使用文字輸入模式進行翻譯
+    </div>
+
+    <!-- ====== Main ====== -->
+    <main id="main">
+
+      <!-- ----- Panel A ----- -->
+      <section class="panel" id="panelA" data-status="idle" data-mode="voice">
+        <div class="panel-header">
+          <select class="lang-select" id="langA"></select>
+          <button class="btn-mode" id="modeA" title="切換文字輸入">⌨️</button>
+        </div>
+
+        <div class="panel-body">
+          <div class="transcript" id="transcriptA">
+            <div class="transcript-original"></div>
+            <div class="transcript-translated"></div>
+          </div>
+          <textarea
+            class="text-input"
+            id="textInputA"
+            placeholder="輸入文字後按 Enter 翻譯…"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="panel-footer">
+          <button class="mic-btn" id="micA">
+            <span class="mic-icon">🎤</span>
+            <span class="mic-hint">按住說話</span>
+          </button>
+          <div class="status-indicator">
+            <span class="status-idle">準備就緒</span>
+            <span class="status-listening">正在聆聽…</span>
+            <span class="status-processing">翻譯中…</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ----- Swap ----- -->
+      <button class="swap-btn" id="btnSwap" title="交換語言">⇅</button>
+
+      <!-- ----- Panel B ----- -->
+      <section class="panel" id="panelB" data-status="idle" data-mode="voice">
+        <div class="panel-header">
+          <select class="lang-select" id="langB"></select>
+          <button class="btn-mode" id="modeB" title="切換文字輸入">⌨️</button>
+        </div>
+
+        <div class="panel-body">
+          <div class="transcript" id="transcriptB">
+            <div class="transcript-original"></div>
+            <div class="transcript-translated"></div>
+          </div>
+          <textarea
+            class="text-input"
+            id="textInputB"
+            placeholder="輸入文字後按 Enter 翻譯…"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="panel-footer">
+          <button class="mic-btn" id="micB">
+            <span class="mic-icon">🎤</span>
+            <span class="mic-hint">按住說話</span>
+          </button>
+          <div class="status-indicator">
+            <span class="status-idle">準備就緒</span>
+            <span class="status-listening">正在聆聽…</span>
+            <span class="status-processing">翻譯中…</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ====== Overlay ====== -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ====== History Drawer ====== -->
+    <aside class="drawer" id="historyDrawer">
+      <div class="drawer-header">
+        <h2>對話記錄</h2>
+        <button class="btn-icon" id="btnCloseHistory">✕</button>
+      </div>
+      <div class="drawer-body" id="historyList"></div>
+      <div class="drawer-footer">
+        <button class="btn-danger" id="btnClearHistory">清除全部記錄</button>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Main app logic (ES module) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
